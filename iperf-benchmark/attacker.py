@@ -13,7 +13,6 @@ class Attacker():
 
         # Port used to collect experiment data - runs in another thread
         self.data_port = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.data_port.setblocking(False)
         self.data_port.bind(('0.0.0.0', 6768))
 
         self.experiment = None
@@ -23,7 +22,7 @@ class Attacker():
     def _collect(self):
         while self.experiment_running:
             try:
-                data, _ = self.data_port.recvfrom(4096)
+                data, _ = self.data_port.recvfrom(4096, socket.MSG_DONTWAIT)
                 print(f"\n========\nreceived data: {data}\n========\n")
             except IOError as e:
                 print(f"[!] no data in collect - {e}")
@@ -103,10 +102,8 @@ def main():
         print("[>] Sending packets ...")
         attacker.collect_experiment_data()
         time.sleep(2)   # Wait for esp32 open iperf server
-        iperf = subprocess.Popen(["bash", "-c", 'iperf -c 192.168.15.117 -B 0.0.0.0:5001 -i 1 -t 5 -p 5001 -b 16000000pps'], start_new_session=True)
-        nmap = subprocess.Popen(["bash", "-c", 'nmap --privileged -sS 192.168.15.117 -p- -A -T insane'], start_new_session=True)
-        # iperf = subprocess.Popen(["iperf", "-c", esp32_addr[0], "-B", "0.0.0.0:5001", "-i", "1", "-t", "180", "-p", "5001", "-b", "16000000pps"], start_new_session=True)
-        # nmap = subprocess.Popen(["nmap", "-sS", esp32_addr[0], "-p-", "-A", "-T", "insane"], start_new_session=True)
+        iperf = subprocess.Popen(["iperf", "-c", esp32_addr[0], "-B", "0.0.0.0:5001", "-i", "1", "-t", "180", "-p", "5001", "-b", "16000000pps"], start_new_session=True)
+        nmap = subprocess.Popen(["nmap", "-sS", esp32_addr[0], "-p-", "-A", "-T", "insane"], start_new_session=True)
         iperf.wait()
         nmap.kill()
         print("[>] Finished sending packets")

@@ -55,3 +55,16 @@ Para configurar o *cliente iperf* é necessário apenas configurar o socket TCP 
 Para o controle de tráfego malicioso, dentro do script em python, que possui toda a lógica de recebimento de dados e a comunicação com o socket do *cliente iperf* da ESP32, também é executado o comando *NMap*.
 
 O *NMap* roda conjuntamente com o *servidor iperf*, no lado do atacante(usuário que deseja receber as métricas da placa), e com o auxílio de algumas flags é possível controlar seu tráfego, como por exemplo a flag `-T`.
+
+## O arquivo data.csv
+Esse arquivo é o resultado das métricas coletadas no experimento. Nele, é importante ressaltar que as métricas mais relevantes são:
+
+- Timestamp: identifica unicamente os pontos de dados a cada segundo.
+- Mbps: identifica a velocidade da rede em um certo momento.
+- wifi: identifica o tempo absoluto gasto com o processamento dos pacotes.
+- Stack: identifica o uso máximo de stack em uma determinada task. 
+
+Esse arquivo é gerado a cada execução do experimento e pode possuir inumeras replicas de um dado experimento (automatizado).
+
+## Como obter métricas de energia?
+- Gustavo

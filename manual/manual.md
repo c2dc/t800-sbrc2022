@@ -69,7 +69,7 @@ Esse arquivo é gerado a cada execução do experimento e pode possuir inumeras 
 ## Como obter métricas de energia?
 Para obtenção das métricas de energia foi utilizado como placa a ser medida uma NodeMCU (referenciada no trabalho genericamente como ESP32) baseada no microcontrolador [ESP32-WROOM-32](https://www.espressif.com/en/products/devkits/esp32-devkitc). O sensor de corrente para medição de consumo de energia foi o [INA219](https://github.com/adafruit/Adafruit_INA219) e para leitura desse sensor, utilizou-se da comunicação I2C disponível nesse circuito integrado para leitura por uma segunda placa microcontrolada ([Nano BLE Sense 33](https://store.arduino.cc/products/arduino-nano-33-ble-sense)). Essa placa de leitura transmite os dados obtidos via I2C por comunicação serial para o computador host através de um cabo USB.
 
-O código fonte para leitura do sensor INA219 via I2C e transmissão serial está disponível [nesse repositório](./extra/measure_power_nano_ble.ino). A placa responsável pela leitura do sensor INA219 realiza a leitura dos seguintes parâmetros:
+O código fonte para leitura do sensor INA219 via I2C e transmissão serial está disponível [nesse repositório](https://github.com/c2dc/t800-sbrc2022/blob/main/collected_data/pwr_measure/measure_power_nano_ble/measure_power_nano_ble.ino). A placa responsável pela leitura do sensor INA219 realiza a leitura dos seguintes parâmetros:
 
 - Tensão (V)
 - Tensão Shunt (mV)
@@ -77,8 +77,8 @@ O código fonte para leitura do sensor INA219 via I2C e transmissão serial est�
 - Corrent (mA)
 - Potência (mW)
 
-Em adição aos 5 parâmetros disponibilizados via I2C pelo sensor de corrente INA219, também é feito a leitura do pino discreto D5 da placa ESP32. Esse pino digital é utilizado como parte do experimento para dizer quando um experimento é iniciado (indo para o nível alto) e quando ele é concluído (retornando para nível baixo).
+Em adição aos 5 parâmetros disponibilizados via I2C pelo sensor de corrente INA219, também é feito a leitura do pino discreto D5 da placa ESP32. Esse pino digital é utilizado como parte do experimento para dizer quando um experimento é iniciado (indo para o nível alto) e quando ele é concluído (retornando para nível baixo). Facilitando assim a análise dos dados gerados pelos experimentos, uma vez que apenas as leituras enquando o sinal discreto está em nível alto é considerado.
 
-Desta forma, os 6 parâmetros lidos pela placa Nano BLE Sense 33 na máxima frequência (loop infinito sem delay) é transmitido via comunicação serial com o computador host com um baudrate de 115200 bps e a mensagem no formato *comma separated values*.
+Desta forma, os 6 parâmetros lidos pela placa Nano BLE Sense 33 na máxima frequência (loop infinito sem delay) é transmitido via comunicação serial com o computador host com um baudrate de 115200 bps e a mensagem no formato *comma separated values*. A leitura da comunicação serial pelo computador host é parte do script *attacker.py* (conforme o [seguinte trecho](https://github.com/c2dc/t800-sbrc2022/blob/main/collected_data/pwr_measure/attacker.py#L81-L97)).
 
 Um esquemático da montagem do sistema de medição está disponível [aqui](./extra/sketch.fzz) e deve ser visualizado com a ferramenta [Fritzing](https://fritzing.org/).

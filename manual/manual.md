@@ -82,5 +82,6 @@ Em adição aos 5 parâmetros disponibilizados via I2C pelo sensor de corrente I
 Desta forma, os 6 parâmetros lidos pela placa Nano BLE Sense 33 na máxima frequência (loop infinito sem delay) é transmitido via comunicação serial com o computador host com um baudrate de 115200 bps e a mensagem no formato *comma separated values*. A leitura da comunicação serial pelo computador host é parte do script *attacker.py* (conforme o [seguinte trecho](https://github.com/c2dc/t800-sbrc2022/blob/main/collected_data/pwr_measure/attacker.py#L81-L97)).
 
 Um esquemático da montagem do sistema de medição está disponível [aqui](./extra/sketch.fzz) e deve ser visualizado com a ferramenta [Fritzing](https://fritzing.org/). E uma imagem do setup experimental para obtenção das métricas de energia:
-
-<img src="./extra/setup.png" alt="Experimental Setup para Power Measurement" width="200"/>
+<p align="center">
+  <img src="./extra/setup.png" alt="Experimental Setup para Power Measurement" width="70%"/>
+</p>

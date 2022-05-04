@@ -23,24 +23,26 @@ class Attacker():
         while self.experiment_running:
             try:
                 data, _ = self.data_port.recvfrom(4096, socket.MSG_DONTWAIT)
-                print(f"\n========\nreceived data: {data}\n========\n")
+                # print(f"\n========\nreceived data: {data}\n========\n")
             except IOError as e:
                 print(f"[!] no data in collect - {e}")
             else:
                 print("[+] collect received data")
                 data = str(data.decode())
+                # print(data)
                 log = {}
                 for line in data.split("\r\n"):
                     metric, value = tuple(map(lambda x: x.strip(), line.split('\t')[:2]))
-                    print(f"metric: {metric}\tvalue: {value}")
-                    log[metric] = value
-                
+                    # print(f"metric: {metric}\tvalue: {value}")
+                    if metric != "main":
+                        log[metric] = value
+
                 self.logs.append(log)
 
             time.sleep(1)
 
     def collect_experiment_data(self):
-        print(f"[+] Start collect_experiment_data")
+        print("[+] Start collect_experiment_data")
         self.experiment_running = True
         self.experiment = threading.Thread(target=self._collect)
         self.experiment.start()
@@ -52,23 +54,26 @@ class Attacker():
         # append the experiment log to CSV file
         data_file = open(fname, "a+")
 
+        # sort all the dictionaries to guarantee the order
+        for i in range(len(self.logs)):
+            self.logs[i] = dict(sorted(self.logs[i].items()))
+
         header = ",".join(self.logs[1].keys()) + "\n" # all logs send the same data, so choose any
         data_file.write(header)
-        
-        self.logs.sort(key=lambda log: log["Timestamp"])
-        
-        print(f"[+] collected {len(self.logs)} data_points")
-        print(f"logs: {self.logs}")
+
+        # print(f"[+] collected {len(self.logs)} data_points")
+        # print(f"logs: {self.logs}")
         for log in self.logs:
             # since all logs have the same keys, always inserted in the same order,
             # iteration order of log.values() should be consistent
             formatted_values = ",".join(log.values()) + "\n" # format to CSV
             data_file.write(formatted_values)
-        
+
         data_file.close()
         print(f"[-] Saved log into file '{fname}'")
 
         self.logs.clear()
+
 
 def msg_esp(expected, attacker, esp32_addr=None, msg=None, is_sync=False):
     esp32_signal = b""
@@ -84,11 +89,12 @@ def msg_esp(expected, attacker, esp32_addr=None, msg=None, is_sync=False):
 
     return esp32_addr
 
+
 def main():
     attacker = Attacker()
 
-    trees = [b"m", b"m", b"m", b"m", b"m"]
-    for tree in trees:
+    models = [b"m", b"2", b"0"]
+    for tree in models:
         print("Going to tree", tree)
 
         esp32_addr = msg_esp(b"start", attacker, is_sync=True)
@@ -102,7 +108,7 @@ def main():
         print("[>] Sending packets ...")
         attacker.collect_experiment_data()
         time.sleep(2)   # Wait for esp32 open iperf server
-        iperf = subprocess.Popen(["iperf", "-c", esp32_addr[0], "-B", "0.0.0.0:5001", "-i", "1", "-t", "180", "-p", "5001", "-b", "16000000pps"], start_new_session=True)
+        iperf = subprocess.Popen(["iperf", "-c", esp32_addr[0], "-B", "0.0.0.0:5001", "-i", "1", "-t", "15", "-p", "5001", "-b", "16000000pps"], start_new_session=True)
         nmap = subprocess.Popen(["nmap", "-sS", esp32_addr[0], "-p-", "-A", "-T", "insane"], start_new_session=True)
         iperf.wait()
         nmap.kill()
@@ -117,6 +123,7 @@ def main():
         print("[+] Experiment data saved in file")
 
         time.sleep(5)
+
 
 if __name__ == "__main__":
     main()

@@ -268,21 +268,25 @@ void measurer_task(void *pvParameters) {
         int size_stats = strlen(runtime_stats);
         runtime_stats[size_stats] = '\0';
         
+        ESP_LOGW(TAG, "Timestamp: %u", cur);
         sprintf(&runtime_stats[size_stats], "Timestamp\t%u", cur);
-        size_stats += strlen(runtime_stats+size_stats);
-        runtime_stats[size_stats] = '\0';
+        /* size_stats += strlen(runtime_stats+size_stats); */
+        size_stats = strlen(runtime_stats);
+        /* runtime_stats[size_stats] = '\0'; */
 
         // Generate and append Stack stats to collected data
         UBaseType_t stack_stats = uxTaskGetStackHighWaterMark(wifi_task);
         sprintf(&runtime_stats[size_stats], "\r\nStack\t%u", stack_stats);
 
         // Get network bandwidth stats
-        size_stats += strlen(runtime_stats+size_stats);
-        runtime_stats[size_stats] = '\0';
+        /* size_stats += strlen(runtime_stats+size_stats); */
+        size_stats = strlen(runtime_stats);
+        /* runtime_stats[size_stats] = '\0'; */
 
         double actual_bandwidth = (exp_bandwidth / 1e6 * 8) / SAMPLING_INTERVAL;
         sprintf(&runtime_stats[size_stats], "\r\nMbps\t%.2f", actual_bandwidth);
         printf("actual_bandwidth: %.2f |-------------\n", actual_bandwidth);
+
         cur += SAMPLING_INTERVAL;
                
         // Reset network measuring after experiment.
